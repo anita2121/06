@@ -2,87 +2,130 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Latihan DRY</title>
+  <title>Sistem Render Modular</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+    }
+
+    button {
+      margin-right: 10px;
+      padding: 5px 10px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 400px;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #000;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .card {
+      border: 1px solid black;
+      padding: 10px;
+      margin: 5px 0;
+      width: 200px;
+    }
+  </style>
 </head>
 <body>
 
-<h2>TABLE</h2>
-<table border="1">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nama</th>
-    </tr>
-  </thead>
-  <tbody id="tableBody"></tbody>
-</table>
+<h2>Sistem Render Modular</h2>
 
-<h2>LIST</h2>
-<ul id="list"></ul>
+<button onclick="renderTable()">Render Table</button>
+<button onclick="renderCard()">Render Card</button>
+<button onclick="renderList()">Render List</button>
 
-<h2>CARD</h2>
-<div id="card"></div>
-
-<h2>MENU</h2>
-<div id="menu"></div>
+<div id="output"></div>
 
 <script>
   // ======================
   // DATA (DRY)
   // ======================
   const data = [
-    { id: 1, nama: "satu" },
-    { id: 2, nama: "dua" },
-    { id: 3, nama: "tiga" }
+    { id: 1, nama: "Satu" },
+    { id: 2, nama: "Dua" },
+    { id: 3, nama: "Tiga" }
   ];
 
   // ======================
-  // TABLE
+  // BASE FUNCTION (REUSE)
   // ======================
-  const tableBody = document.getElementById("tableBody");
+  function clearOutput() {
+    document.getElementById("output").innerHTML = "";
+  }
 
-  data.forEach(item => {
-    tableBody.innerHTML += `
-      <tr>
-        <td>${item.id}</td>
-        <td>${item.nama}</td>
-      </tr>
+  // ======================
+  // RENDER TABLE
+  // ======================
+  function renderTable() {
+    clearOutput();
+
+    let html = `
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Nama</th>
+        </tr>
     `;
-  });
+
+    data.forEach(item => {
+      html += `
+        <tr>
+          <td>${item.id}</td>
+          <td>${item.nama}</td>
+        </tr>
+      `;
+    });
+
+    html += </table>;
+
+    document.getElementById("output").innerHTML = html;
+  }
 
   // ======================
-  // LIST (UL)
+  // RENDER CARD
   // ======================
-  const list = document.getElementById("list");
+  function renderCard() {
+    clearOutput();
 
-  data.forEach(item => {
-    list.innerHTML += <li>${item.id} - ${item.nama}</li>;
-  });
+    let html = "";
 
-  // ======================
-  // CARD (DIV)
-  // ======================
-  const card = document.getElementById("card");
+    data.forEach(item => {
+      html += `
+        <div class="card">
+          <p><b>ID:</b> ${item.id}</p>
+          <p><b>Nama:</b> ${item.nama}</p>
+        </div>
+      `;
+    });
 
-  data.forEach(item => {
-    card.innerHTML += `
-      <div style="border:1px solid black; margin:5px; padding:10px;">
-        <p>ID: ${item.id}</p>
-        <p>Nama: ${item.nama}</p>
-      </div>
-    `;
-  });
+    document.getElementById("output").innerHTML = html;
+  }
 
   // ======================
-  // MENU
+  // RENDER LIST
   // ======================
-  const menu = document.getElementById("menu");
+  function renderList() {
+    clearOutput();
 
-  data.forEach(item => {
-    menu.innerHTML += `
-      <button>${item.id}. ${item.nama}</button><br>
-    `;
-  });
+    let html = "<ul>";
+
+    data.forEach(item => {
+      html += <li>${item.id} - ${item.nama}</li>;
+    });
+
+    html += "</ul>";
+
+    document.getElementById("output").innerHTML = html;
+  }
 
 </script>
 
