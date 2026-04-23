@@ -1,1 +1,155 @@
+// ==========================
+// DATA SOURCE (DRY)
+// ==========================
+const dataSet = [
+  { id: 1, nama: "satu" },
+  { id: 2, nama: "dua" },
+  { id: 3, nama: "tiga" }
+];
 
+
+// ==========================
+// READER (REUSABLE)
+// ==========================
+class DataReader {
+  constructor(data) {
+    this.data = data;
+  }
+
+  getAll() {
+    return this.data;
+  }
+
+  getById(id) {
+    return this.data.find(item => item.id === id);
+  }
+}
+
+
+// ==========================
+// BASE RENDERER (MODULAR)
+// ==========================
+class BaseRenderer {
+  constructor(reader) {
+    this.reader = reader;
+  }
+
+  render() {
+    throw new Error("Method render() harus di-override");
+  }
+}
+
+
+// ==========================
+// TABLE RENDERER
+// ==========================
+class TableRenderer extends BaseRenderer {
+  render() {
+    const data = this.reader.getAll();
+
+    let output = "=== TABLE ===\n";
+    output += "ID | NAMA\n";
+    output += "------------\n";
+
+    data.forEach(item => {
+      output += ${item.id} | ${item.nama}\n;
+    });
+
+    return output;
+  }
+}
+
+
+// ==========================
+// CARD RENDERER
+// ==========================
+class CardRenderer extends BaseRenderer {
+  render() {
+    const data = this.reader.getAll();
+
+    let output = "=== CARD ===\n";
+
+    data.forEach(item => {
+      output += [ CARD ]\n;
+      output += ID   : ${item.id}\n;
+      output += Nama : ${item.nama}\n;
+      output += -------------\n;
+    });
+
+    return output;
+  }
+}
+
+
+// ==========================
+// LIST RENDERER
+// ==========================
+class ListRenderer extends BaseRenderer {
+  render() {
+    const data = this.reader.getAll();
+
+    let output = "=== LIST ===\n";
+
+    data.forEach(item => {
+      output += - (${item.id}) ${item.nama}\n;
+    });
+
+    return output;
+  }
+}
+
+
+// ==========================
+// MENU RENDERER
+// ==========================
+class MenuRenderer extends BaseRenderer {
+  render() {
+    const data = this.reader.getAll();
+
+    let output = "=== MENU ===\n";
+
+    data.forEach(item => {
+      output += ${item.id}. ${item.nama}\n;
+    });
+
+    return output;
+  }
+}
+
+
+// ==========================
+// FACTORY (SCALABLE)
+// ==========================
+class RendererFactory {
+  static create(type, reader) {
+    switch (type) {
+      case "table":
+        return new TableRenderer(reader);
+      case "card":
+        return new CardRenderer(reader);
+      case "list":
+        return new ListRenderer(reader);
+      case "menu":
+        return new MenuRenderer(reader);
+      default:
+        throw new Error("Tipe renderer tidak dikenali");
+    }
+  }
+}
+
+
+// ==========================
+// MAIN PROGRAM
+// ==========================
+function main() {
+  const reader = new DataReader(dataSet);
+
+  const types = ["table", "card", "list", "menu"];
+
+  types.forEach(type => {
+    const renderer = RendererFactory.create(type, reader);
+    console.log(renderer.render());
+  });
+}
+
+main();
