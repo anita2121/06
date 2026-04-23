@@ -1,155 +1,196 @@
-// ==========================
-// DATA SOURCE (DRY)
-// ==========================
-const dataSet = [
-  { id: 1, nama: "satu" },
-  { id: 2, nama: "dua" },
-  { id: 3, nama: "tiga" }
-];
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Renderer DRY Example</title>
 
-
-// ==========================
-// READER (REUSABLE)
-// ==========================
-class DataReader {
-  constructor(data) {
-    this.data = data;
-  }
-
-  getAll() {
-    return this.data;
-  }
-
-  getById(id) {
-    return this.data.find(item => item.id === id);
-  }
-}
-
-
-// ==========================
-// BASE RENDERER (MODULAR)
-// ==========================
-class BaseRenderer {
-  constructor(reader) {
-    this.reader = reader;
-  }
-
-  render() {
-    throw new Error("Method render() harus di-override");
-  }
-}
-
-
-// ==========================
-// TABLE RENDERER
-// ==========================
-class TableRenderer extends BaseRenderer {
-  render() {
-    const data = this.reader.getAll();
-
-    let output = "=== TABLE ===\n";
-    output += "ID | NAMA\n";
-    output += "------------\n";
-
-    data.forEach(item => {
-      output += ${item.id} | ${item.nama}\n;
-    });
-
-    return output;
-  }
-}
-
-
-// ==========================
-// CARD RENDERER
-// ==========================
-class CardRenderer extends BaseRenderer {
-  render() {
-    const data = this.reader.getAll();
-
-    let output = "=== CARD ===\n";
-
-    data.forEach(item => {
-      output += [ CARD ]\n;
-      output += ID   : ${item.id}\n;
-      output += Nama : ${item.nama}\n;
-      output += -------------\n;
-    });
-
-    return output;
-  }
-}
-
-
-// ==========================
-// LIST RENDERER
-// ==========================
-class ListRenderer extends BaseRenderer {
-  render() {
-    const data = this.reader.getAll();
-
-    let output = "=== LIST ===\n";
-
-    data.forEach(item => {
-      output += - (${item.id}) ${item.nama}\n;
-    });
-
-    return output;
-  }
-}
-
-
-// ==========================
-// MENU RENDERER
-// ==========================
-class MenuRenderer extends BaseRenderer {
-  render() {
-    const data = this.reader.getAll();
-
-    let output = "=== MENU ===\n";
-
-    data.forEach(item => {
-      output += ${item.id}. ${item.nama}\n;
-    });
-
-    return output;
-  }
-}
-
-
-// ==========================
-// FACTORY (SCALABLE)
-// ==========================
-class RendererFactory {
-  static create(type, reader) {
-    switch (type) {
-      case "table":
-        return new TableRenderer(reader);
-      case "card":
-        return new CardRenderer(reader);
-      case "list":
-        return new ListRenderer(reader);
-      case "menu":
-        return new MenuRenderer(reader);
-      default:
-        throw new Error("Tipe renderer tidak dikenali");
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
     }
-  }
-}
 
+    .container {
+      margin-bottom: 30px;
+    }
 
+    table {
+      border-collapse: collapse;
+      width: 300px;
+    }
+
+    table, th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .card {
+      border: 1px solid #333;
+      padding: 10px;
+      margin: 5px;
+      width: 200px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    .menu button {
+      display: block;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Data Renderer (DRY, Modular, Scalable)</h1>
+
+  <div id="table" class="container"></div>
+  <div id="card" class="container"></div>
+  <div id="list" class="container"></div>
+  <div id="menu" class="container"></div>
+
+  <script>
+    // ==========================
+    // DATA SOURCE (DRY)
+    // ==========================
+    const dataSet = [
+      { id: 1, nama: "satu" },
+      { id: 2, nama: "dua" },
+      { id: 3, nama: "tiga" }
+    ];
+
+    // ==========================
+    // READER
+    // ==========================
+    class DataReader {
+      constructor(data) {
+        this.data = data;
+      }
+
+      getAll() {
+        return this.data;
+      }
+    }
+
+    // ==========================
+    // BASE RENDERER
+    // ==========================
+    class BaseRenderer {
+      constructor(reader, containerId) {
+        this.reader = reader;
+        this.container = document.getElementById(containerId);
+      }
+
+      render() {
+        throw "Harus override render()";
+      }
+    }
+
+    // ==========================
+    // TABLE RENDERER
+    // ==========================
+    class TableRenderer extends BaseRenderer {
+      render() {
+        const data = this.reader.getAll();
+
+        let html = "<h2>Table</h2>";
+        html += "<table><tr><th>ID</th><th>Nama</th></tr>";
+
+        data.forEach(item => {
+          html += <tr><td>${item.id}</td><td>${item.nama}</td></tr>;
+        });
+
+        html += "</table>";
+        this.container.innerHTML = html;
+      }
+    }
+
+    // ==========================
+    // CARD RENDERER
+    // ==========================
+    class CardRenderer extends BaseRenderer {
+      render() {
+        const data = this.reader.getAll();
+
+        let html = "<h2>Card</h2>";
+
+        data.forEach(item => {
+          html += `
+            <div class="card">
+              <p><b>ID:</b> ${item.id}</p>
+              <p><b>Nama:</b> ${item.nama}</p>
+            </div>
+          `;
+        });
+
+        this.container.innerHTML = html;
+      }
+    }
+
+    // ==========================
+    // LIST RENDERER
+    // ==========================
+    class ListRenderer extends BaseRenderer {
+      render() {
+        const data = this.reader.getAll();
+
+        let html = "<h2>List</h2><ul>";
+
+        data.forEach(item => {
+          html += <li>(${item.id}) ${item.nama}</li>;
+        });
+
+        html += "</ul>";
+        this.container.innerHTML = html;
+      }
+    }
+
+    // ==========================
+    // MENU RENDERER
+    // ==========================
+    class MenuRenderer extends BaseRenderer {
+      render() {
+        const data = this.reader.getAll();
+
+        let html = "<h2>Menu</h2><div class='menu'>";
+
+        data.forEach(item => {
+          html += `<button onclick="alert('Kamu pilih: ${item.nama}')">
+                    ${item.id}. ${item.nama}
+                   </button>`;
+        });
+
+        html += "</div>";
+        this.container.innerHTML = html;
+      }
+    }
+
+    // ==========================
+    // FACTORY (SCALABLE)
+    // ==========================
+    class RendererFactory {
+      static create(type, reader, containerId) {
+        switch(type) {
+          case "table": return new TableRenderer(reader, containerId);
+          case "card": return new CardRenderer(reader, containerId);
+          case "list": return new ListRenderer(reader, containerId);
+          case "menu": return new MenuRenderer(reader, containerId);
+        }
+      }
+    }
 // ==========================
-// MAIN PROGRAM
-// ==========================
-function main() {
-  const reader = new DataReader(dataSet);
+    // MAIN
+    // ==========================
+    const reader = new DataReader(dataSet);
 
-  const types = ["table", "card", "list", "menu"];
+    RendererFactory.create("table", reader, "table").render();
+    RendererFactory.create("card", reader, "card").render();
+    RendererFactory.create("list", reader, "list").render();
+    RendererFactory.create("menu", reader, "menu").render();
 
-  types.forEach(type => {
-    const renderer = RendererFactory.create(type, reader);
-    console.log(renderer.render());
-  });
-}
+  </script>
 
-main();
+</body>
+</html>
