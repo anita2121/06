@@ -2,195 +2,89 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Renderer DRY Example</title>
-
-  <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-    }
-
-    .container {
-      margin-bottom: 30px;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 300px;
-    }
-
-    table, th, td {
-      border: 1px solid black;
-      padding: 8px;
-      text-align: left;
-    }
-
-    .card {
-      border: 1px solid #333;
-      padding: 10px;
-      margin: 5px;
-      width: 200px;
-    }
-
-    ul {
-      padding-left: 20px;
-    }
-
-    .menu button {
-      display: block;
-      margin: 5px 0;
-    }
-  </style>
+  <title>Latihan DRY</title>
 </head>
 <body>
 
-  <h1>Data Renderer (DRY, Modular, Scalable)</h1>
+<h2>TABLE</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nama</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
 
-  <div id="table" class="container"></div>
-  <div id="card" class="container"></div>
-  <div id="list" class="container"></div>
-  <div id="menu" class="container"></div>
+<h2>LIST</h2>
+<ul id="list"></ul>
 
-  <script>
-    // ==========================
-    // DATA SOURCE (DRY)
-    // ==========================
-    const dataSet = [
-      { id: 1, nama: "satu" },
-      { id: 2, nama: "dua" },
-      { id: 3, nama: "tiga" }
-    ];
+<h2>CARD</h2>
+<div id="card"></div>
 
-    // ==========================
-    // READER
-    // ==========================
-    class DataReader {
-      constructor(data) {
-        this.data = data;
-      }
+<h2>MENU</h2>
+<div id="menu"></div>
 
-      getAll() {
-        return this.data;
-      }
-    }
+<script>
+  // ======================
+  // DATA (DRY)
+  // ======================
+  const data = [
+    { id: 1, nama: "satu" },
+    { id: 2, nama: "dua" },
+    { id: 3, nama: "tiga" }
+  ];
 
-    // ==========================
-    // BASE RENDERER
-    // ==========================
-    class BaseRenderer {
-      constructor(reader, containerId) {
-        this.reader = reader;
-        this.container = document.getElementById(containerId);
-      }
+  // ======================
+  // TABLE
+  // ======================
+  const tableBody = document.getElementById("tableBody");
 
-      render() {
-        throw "Harus override render()";
-      }
-    }
+  data.forEach(item => {
+    tableBody.innerHTML += `
+      <tr>
+        <td>${item.id}</td>
+        <td>${item.nama}</td>
+      </tr>
+    `;
+  });
 
-    // ==========================
-    // TABLE RENDERER
-    // ==========================
-    class TableRenderer extends BaseRenderer {
-      render() {
-        const data = this.reader.getAll();
+  // ======================
+  // LIST (UL)
+  // ======================
+  const list = document.getElementById("list");
 
-        let html = "<h2>Table</h2>";
-        html += "<table><tr><th>ID</th><th>Nama</th></tr>";
+  data.forEach(item => {
+    list.innerHTML += <li>${item.id} - ${item.nama}</li>;
+  });
 
-        data.forEach(item => {
-          html += <tr><td>${item.id}</td><td>${item.nama}</td></tr>;
-        });
+  // ======================
+  // CARD (DIV)
+  // ======================
+  const card = document.getElementById("card");
 
-        html += "</table>";
-        this.container.innerHTML = html;
-      }
-    }
+  data.forEach(item => {
+    card.innerHTML += `
+      <div style="border:1px solid black; margin:5px; padding:10px;">
+        <p>ID: ${item.id}</p>
+        <p>Nama: ${item.nama}</p>
+      </div>
+    `;
+  });
 
-    // ==========================
-    // CARD RENDERER
-    // ==========================
-    class CardRenderer extends BaseRenderer {
-      render() {
-        const data = this.reader.getAll();
+  // ======================
+  // MENU
+  // ======================
+  const menu = document.getElementById("menu");
 
-        let html = "<h2>Card</h2>";
+  data.forEach(item => {
+    menu.innerHTML += `
+      <button>${item.id}. ${item.nama}</button><br>
+    `;
+  });
 
-        data.forEach(item => {
-          html += `
-            <div class="card">
-              <p><b>ID:</b> ${item.id}</p>
-              <p><b>Nama:</b> ${item.nama}</p>
-            </div>
-          `;
-        });
-
-        this.container.innerHTML = html;
-      }
-    }
-
-    // ==========================
-    // LIST RENDERER
-    // ==========================
-    class ListRenderer extends BaseRenderer {
-      render() {
-        const data = this.reader.getAll();
-
-        let html = "<h2>List</h2><ul>";
-
-        data.forEach(item => {
-          html += <li>(${item.id}) ${item.nama}</li>;
-        });
-
-        html += "</ul>";
-        this.container.innerHTML = html;
-      }
-    }
-
-    // ==========================
-    // MENU RENDERER
-    // ==========================
-    class MenuRenderer extends BaseRenderer {
-      render() {
-        const data = this.reader.getAll();
-
-        let html = "<h2>Menu</h2><div class='menu'>";
-
-        data.forEach(item => {
-          html += `<button onclick="alert('Kamu pilih: ${item.nama}')">
-                    ${item.id}. ${item.nama}
-                   </button>`;
-        });
-
-        html += "</div>";
-        this.container.innerHTML = html;
-      }
-    }
-
-    // ==========================
-    // FACTORY (SCALABLE)
-    // ==========================
-    class RendererFactory {
-      static create(type, reader, containerId) {
-        switch(type) {
-          case "table": return new TableRenderer(reader, containerId);
-          case "card": return new CardRenderer(reader, containerId);
-          case "list": return new ListRenderer(reader, containerId);
-          case "menu": return new MenuRenderer(reader, containerId);
-        }
-      }
-    }
-// ==========================
-    // MAIN
-    // ==========================
-    const reader = new DataReader(dataSet);
-
-    RendererFactory.create("table", reader, "table").render();
-    RendererFactory.create("card", reader, "card").render();
-    RendererFactory.create("list", reader, "list").render();
-    RendererFactory.create("menu", reader, "menu").render();
-
-  </script>
+</script>
 
 </body>
 </html>
