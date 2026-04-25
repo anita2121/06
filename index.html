@@ -189,7 +189,7 @@ const wrappers = {
 // RENDER
 function renderData(type) {
     let content;
-      if (type === "array") {
+    if (type === "array") {
         content = renderStrategies[type]();
     } else {
         content = dataSet.map(item => renderStrategies[type](item)).join("");
