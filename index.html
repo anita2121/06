@@ -2,59 +2,94 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dynamic View Engine</title>
+<title>Smart Render System Pro</title>
 
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #eef2ff, #ffffff);
     padding: 20px;
 }
 
-h2 { margin-bottom: 15px; }
-
-/* NAV */
-.menu-bar {
-    display: flex;
-    gap: 8px;
-    background: white;
-    padding: 10px;
-    border-radius: 25px;
-    width: fit-content;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-.menu-bar button {
-    border: none;
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: transparent;
-    cursor: pointer;
-}
-
-.menu-bar button.active {
-    background: #4f46e5;
-    color: white;
-}
-
-/* FORM */
-.form-area {
-    background: white;
-    padding: 12px;
-    border-radius: 10px;
+/* HEADER */
+h2 {
     margin-bottom: 15px;
 }
 
-input {
-    padding: 6px;
-    margin-right: 8px;
+/* NAVBAR (LEBIH KEREN) */
+.navbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    width: fit-content;
 }
 
-button.add {
-    background: #22c55e;
+.navbar button {
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.navbar button:hover {
+    background: #eef2ff;
+}
+
+.navbar button.active {
+    background: #6366f1;
+    color: white;
+    box-shadow: 0 3px 8px rgba(99,102,241,0.4);
+}
+
+/* FORM */
+.form-box {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
+
+.add-btn {
+    background: #10b981;
     color: white;
     border: none;
-    padding: 6px 12px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* CARD */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.card {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    transition: 0.3s;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.08);
+}
+
+.card:hover {
+    transform: translateY(-5px);
 }
 
 /* TABLE */
@@ -62,121 +97,136 @@ table {
     width: 100%;
     border-collapse: collapse;
     background: white;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 th {
-    background: #4f46e5;
+    background: #6366f1;
     color: white;
 }
 
 th, td {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
-}
-
-/* CARD */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-}
-
-.box {
-    background: white;
     padding: 10px;
-    border-radius: 10px;
+    border-bottom: 1px solid #ddd;
 }
 
 /* LIST */
 ul {
     background: white;
-    padding: 10px;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* ANIMASI */
+.fade {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>
-</head>
 
+</head>
 <body>
 
-<h2>⚡️ Dynamic View Engine</h2>
+<h2>✨ Smart Render System Pro</h2>
 
-<div class="form-area">
-    <input type="text" id="inputNama" placeholder="Nama...">
-    <button class="add" onclick="addItem()">Tambah</button>
+<!-- FORM TAMBAH DATA -->
+<div class="form-box">
+    <input type="text" id="namaInput" placeholder="Masukkan nama...">
+    <button class="add-btn" onclick="tambahData()">Tambah</button>
 </div>
 
-<div class="menu-bar">
-    <button onclick="switchView(this,'table')">Table</button>
-    <button onclick="switchView(this,'card')">Card</button>
-    <button onclick="switchView(this,'list')">List</button>
-    <button onclick="switchView(this,'json')">JSON</button>
+<!-- MENU KEREN -->
+<div class="navbar">
+    <button onclick="handleClick(this, 'table')">Table</button>
+    <button onclick="handleClick(this, 'card')">Card</button>
+    <button onclick="handleClick(this, 'list')">List</button>
+    <button onclick="handleClick(this, 'menu')">Menu</button>
+    <button onclick="handleClick(this, 'array')">Array</button>
 </div>
 
-<div id="output"></div>
+<!-- OUTPUT -->
+<div id="app" class="fade">
+    <p>Pilih menu di atas 🚀</p>
+</div>
 
 <script>
-// DATA
-let items = [
+// DATA AWAL (SCALABLE)
+let dataSet = [
     { id: 1, nama: "Satu" },
     { id: 2, nama: "Dua" },
-    { id: 3, nama: "Tiga" }
+    { id: 3, nama: "Tiga" },
+    { id: 4, nama: "Empat" },
+    { id: 5, nama: "Lima" },
+    { id: 6, nama: "Enam" },
+    { id: 7, nama: "Tujuh" },
+    { id: 8, nama: "Delapan" },
+    { id: 9, nama: "Sembilan" }
 ];
 
-// TEMPLATE (beda nama dari strategy)
-const templates = {
-    table: (x) => <tr><td>${x.id}</td><td>${x.nama}</td></tr>,
-    card: (x) => <div class="box"><b>${x.nama}</b><br>ID: ${x.id}</div>,
-    list: (x) => <li>${x.id} - ${x.nama}</li>,
-    json: () => <pre>${JSON.stringify(items, null, 2)}</pre>
+// STRATEGY (DRY)
+const renderStrategies = {
+    table: (item) => <tr><td>${item.id}</td><td>${item.nama}</td></tr>,
+    card: (item) => <div class="card"><h3>${item.nama}</h3><p>ID: ${item.id}</p></div>,
+    list: (item) => <li>${item.nama} (ID: ${item.id})</li>,
+    menu: (item) => <span style="padding:6px 12px;background:#eef2ff;border-radius:15px">${item.nama}</span>,
+    array: () => <pre>${JSON.stringify(dataSet, null, 2)}</pre>
 };
 
-// WRAP
-const layouts = {
-    table: (c) => <table><tr><th>ID</th><th>Nama</th></tr>${c}</table>,
-    card: (c) => <div class="grid">${c}</div>,
+// WRAPPER (MODULAR)
+const wrappers = {
+    table: (c) => <table><thead><tr><th>ID</th><th>Nama</th></tr></thead><tbody>${c}</tbody></table>,
+    card: (c) => <div class="card-grid">${c}</div>,
     list: (c) => <ul>${c}</ul>,
-    json: (c) => c
+    menu: (c) => <div style="display:flex;gap:10px;flex-wrap:wrap;background:white;padding:15px;border-radius:10px">${c}</div>,
+    array: (c) => c
 };
 
 // RENDER
-function show(type) {
-    let hasil;
-
-    if (type === "json") {
-        hasil = templates[type]();
+function renderData(type) {
+    let content;
+      if (type === "array") {
+        content = renderStrategies[type]();
     } else {
-        hasil = items.map(i => templates[type](i)).join("");
+        content = dataSet.map(item => renderStrategies[type](item)).join("");
     }
 
-    document.getElementById("output").innerHTML = layouts[type](hasil);
+    document.getElementById("app").innerHTML =
+        <div class="fade">${wrappers[type](content)}</div>;
 }
 
-// BUTTON ACTIVE
-function switchView(btn, type) {
-    document.querySelectorAll(".menu-bar button").forEach(b => b.classList.remove("active"));
+// MENU ACTIVE
+function handleClick(btn, type) {
+    document.querySelectorAll(".navbar button").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    show(type);
+    renderData(type);
 }
 
-// ADD
-function addItem() {
-    const input = document.getElementById("inputNama");
-    const val = input.value.trim();
+// TAMBAH DATA
+function tambahData() {
+    const input = document.getElementById("namaInput");
+    const nama = input.value.trim();
 
-    if (!val) return alert("Isi dulu!");
+    if (!nama) {
+        alert("Nama tidak boleh kosong!");
+        return;
+    }
 
-    const newId = items.length
-        ? Math.max(...items.map(i => i.id)) + 1
-        : 1;
+    const newId = dataSet.length + 1;
+    dataSet.push({ id: newId, nama: nama });
 
-    items.push({ id: newId, nama: val });
     input.value = "";
 
-    const active = document.querySelector(".menu-bar button.active");
-    if (active) active.click();
+    // auto refresh tampilan terakhir
+    const activeBtn = document.querySelector(".navbar button.active");
+    if (activeBtn) {
+        activeBtn.click();
+    }
 }
-
-// DEFAULT
-show("table");
 </script>
 
 </body>
